@@ -6,6 +6,20 @@ import sys
 
 import pennyworth.host
 
+
+class Command:
+    def __init__(self, *args, **kwargs):
+        self.parser = argparse.ArgumentParser(
+            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+            *args, **kwargs)
+
+    def execute(self, *args, **kwargs):
+        pass
+
+    def process(self, parsed_args):
+        pass
+
+
 def _get_host(host):
     host_list = pennyworth.host.get_hosts()
     if host_list:
@@ -17,11 +31,9 @@ def _get_host(host):
     raise Exception("No hosts in listed")
 
 
-class Command:
+class HostCommand(Command):
     def __init__(self, *args, **kwargs):
-        self.parser = argparse.ArgumentParser(
-            formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-            *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.add_argument("--host",
                           default=argparse.SUPPRESS,
                           help="The host to use.  If unspecified, the first "
@@ -34,14 +46,17 @@ class Command:
     def add_argument(self, *args, **kwargs):
         self.parser.add_argument(*args, **kwargs)
 
-    def execute(self, *args, **kwargs):
-        parsed_args = self.parser.parse_args(*args, **kwargs)
+    @staticmethod
+    def make_host(parsed_args):
         hostname = None
         if 'host' in parsed_args:
             hostname = parsed_args.host
         host = _get_host(hostname)
-        self.process(pennyworth.host.make_host(host, parsed_args.folder),
-                     parsed_args)
+        return pennyworth.host.make_host(host, parsed_args.folder)
+
+    def execute(self, *args, **kwargs):
+        parsed_args = self.parser.parse_args(*args, **kwargs)
+        self.process(parsed_args)
 
     def process(self, host, parsed_args):
         pass

@@ -32,5 +32,5 @@ def make_host(host_config, folder=None):
     if folder:
         folders = folder.split('/')
         kwargs['baseurl'] += "/{}{}".format("job/", "/job/".join(folders))
-    #print(kwargs)
+    # print(kwargs)
     return Host(**kwargs)

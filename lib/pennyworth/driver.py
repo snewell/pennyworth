@@ -8,13 +8,16 @@ import sys
 
 import pennyworth.plugin
 
+
 def _do_help():
     print("usage: pennyworth tool [tool args]")
     print("Arguments:")
     print("\t--help\tDisplay this help")
     print("\t--list\tDisplay available tools")
 
+
 _TOOLS = pennyworth.plugin.query_plugins("pennyworth.commands")
+
 
 def _do_list():
     for tool in sorted(_TOOLS):

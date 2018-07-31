@@ -3,13 +3,14 @@
 import pennyworth.command
 
 
-class ListJobsCommand(pennyworth.command.Command):
+class ListJobsCommand(pennyworth.command.HostCommand):
     def __init__(self):
         super().__init__(prog="pennyworth list-jobs",
                          description="List all jobs")
 
-    def process(self, host, parsed_args):
+    def process(self, parsed_args):
         #print("{}\n\n{}".format(host, parsed_args))
+        host = self.make_host(parsed_args)
         for job in sorted(host.list_jobs()):
             print(job)
 

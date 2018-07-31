@@ -13,8 +13,12 @@ class Command:
             formatter_class=argparse.ArgumentDefaultsHelpFormatter,
             *args, **kwargs)
 
+    def add_argument(self, *args, **kwargs):
+        self.parser.add_argument(*args, **kwargs)
+
     def execute(self, *args, **kwargs):
-        pass
+        parsed_args = self.parser.parse_args(*args, **kwargs)
+        self.process(parsed_args)
 
     def process(self, parsed_args):
         pass
@@ -43,9 +47,6 @@ class HostCommand(Command):
                           default=None,
                           help="The folder to operate in.")
 
-    def add_argument(self, *args, **kwargs):
-        self.parser.add_argument(*args, **kwargs)
-
     @staticmethod
     def make_host(parsed_args):
         hostname = None
@@ -53,10 +54,6 @@ class HostCommand(Command):
             hostname = parsed_args.host
         host = _get_host(hostname)
         return pennyworth.host.make_host(host, parsed_args.folder)
-
-    def execute(self, *args, **kwargs):
-        parsed_args = self.parser.parse_args(*args, **kwargs)
-        self.process(parsed_args)
 
     def process(self, host, parsed_args):
         pass

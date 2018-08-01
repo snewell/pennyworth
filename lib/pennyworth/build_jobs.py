@@ -31,7 +31,8 @@ class BuildJobsCommand(pennyworth.command.Command):
         chunk_cache = pennyworth.job_config.ChunkCache()
         for job in jobs:
             config = pennyworth.job_config.build_config(
-                job_config.get_job_chunks(job), chunk_cache)
+                job_config.get_job_chunks(job), chunk_cache,
+                job_config.get_job_subs(job))
             print(job)
             print(config)
 

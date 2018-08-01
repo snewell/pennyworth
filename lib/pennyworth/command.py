@@ -55,7 +55,7 @@ class HostCommand(Command):
         host = _get_host(hostname)
         return pennyworth.host.make_host(host, parsed_args.folder)
 
-    def process(self, host, parsed_args):
+    def process(self, parsed_args):
         pass
 
 

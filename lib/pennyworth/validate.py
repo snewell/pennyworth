@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
 import difflib
-import sys
 
 import pennyworth.command
 import pennyworth.host

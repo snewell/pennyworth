@@ -18,7 +18,7 @@ class Host:
         self._host = jenkinsapi.jenkins.Jenkins(*args, **kwargs)
 
     def list_jobs(self):
-        return self._host.get_jobs_list()
+        return self._host.get_jobs()
 
 
 def make_host(host_config, folder=None):

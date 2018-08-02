@@ -33,9 +33,9 @@ class JobConfigs:
     def get_job_subs(self, job_name):
         subs = []
         for option, value in self._config[job_name].items():
-            m = _OPTION_PATTERN.match(option)
-            if m:
-                sub = re.compile("@@{}@@".format(option[m.end():].upper()))
+            match = _OPTION_PATTERN.match(option)
+            if match:
+                sub = re.compile("@@{}@@".format(option[match.end():].upper()))
                 subs.append((sub, value))
         return subs
 

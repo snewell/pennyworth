@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+"""Code to support the build-jobs command."""
+
 import argparse
 
 import pennyworth.command
@@ -24,6 +26,10 @@ def _generate_configs(job_config, jobs):
 
 
 class BuildJobsCommand(pennyworth.command.Command):
+    """
+    Class to implement the build-jobs command.
+    """
+
     def __init__(self):
         super().__init__(prog="pennyworth build-jobs",
                          description="Build job configurations")
@@ -43,7 +49,6 @@ class BuildJobsCommand(pennyworth.command.Command):
             print(name)
             print('-' * len(name))
             print(config)
-
 
 
 def main(args=None):

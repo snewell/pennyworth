@@ -40,7 +40,12 @@ following will work:
 
 Using
 -----
-Documentation coming soon...
+pennyworth uses sub-commands to perform various tasks.  The built-in
+sub-commands are:
+
+* `build-jobs`_
+* `list-jobs`_
+* `validate`_
 
 
 .. |codacy| image:: https://api.codacy.com/project/badge/Grade/d457ee2e8da847ba9d91e5357f0ccf06
@@ -53,3 +58,7 @@ Documentation coming soon...
 .. _Jenkins: https://jenkins.io
 .. _pip: https://pypi.python.org/pypi/pip
 .. _PyPi: https://pypi.python.org
+
+.. _build-jobs: docs/commands/build-jobs.rst
+.. _list-jobs: docs/commands/list-jobs.rst
+.. _validate: docs/commands/validate.rst

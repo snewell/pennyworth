@@ -12,6 +12,17 @@ def _verify_legal_jobs(requested, available):
             raise Exception("{} is not a valid job".format(job))
 
 
+def _generate_configs(job_config, jobs):
+    generated_configs = {}
+    chunk_cache = pennyworth.job_config.ChunkCache()
+    for job in jobs:
+        config = pennyworth.job_config.build_config(
+            job_config.get_job_chunks(job), chunk_cache,
+            job_config.get_job_subs(job))
+        generated_configs[job] = config
+    return generated_configs
+
+
 class BuildJobsCommand(pennyworth.command.Command):
     def __init__(self):
         super().__init__(prog="pennyworth build-jobs",
@@ -27,14 +38,12 @@ class BuildJobsCommand(pennyworth.command.Command):
             jobs = parsed_args.jobs
         else:
             jobs = job_config.get_jobs()
-
-        chunk_cache = pennyworth.job_config.ChunkCache()
-        for job in jobs:
-            config = pennyworth.job_config.build_config(
-                job_config.get_job_chunks(job), chunk_cache,
-                job_config.get_job_subs(job))
-            print(job)
+        generated_configs = _generate_configs(job_config, jobs)
+        for name, config in generated_configs.items():
+            print(name)
+            print('-' * len(name))
             print(config)
+
 
 
 def main(args=None):

@@ -31,14 +31,16 @@ def _print_diff(name, jenkins_lines, generated_lines):
     diffs = difflib.unified_diff(jenkins_lines, generated_lines,
                                  "jenkins/{}".format(name),
                                  "generated/{}".format(name))
-    try:
-        for _ in range(3):
-            print(next(diffs), end='')
-        for diff in diffs:
+    for diff in diffs:
+        # The issue that control lines (file lines, line offsets) have a
+        # trailing newline but the actual diff lines (both differences and
+        # context lines) do not.  Since some of the diff tools I've trid get
+        # unhappy when there are extra lines, this tries to make sure we don't
+        # print two newlines when it's a control line.
+        if diff[-1] == '\n':
+            print(diff, end='')
+        else:
             print(diff)
-    except StopIteration:
-        # no diffs, so no big deal
-        pass
 
 
 def _print_diffs(jenkins_configs, generated_configs):

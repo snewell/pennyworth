@@ -9,7 +9,7 @@ import pennyworth.job_config
 
 def _get_jenkins_configs(host):
     job_configs = {}
-    for name, job in sorted(host.list_jobs()):
+    for name, job in host.list_jobs():
         job_configs[name] = job.get_config()
     return job_configs
 
@@ -31,10 +31,14 @@ def _print_diff(name, jenkins_lines, generated_lines):
     diffs = difflib.unified_diff(jenkins_lines, generated_lines,
                                  "jenkins/{}".format(name),
                                  "generated/{}".format(name))
-    for _ in range(3):
-        print(next(diffs), end='')
-    for diff in diffs:
-        print(diff)
+    try:
+        for _ in range(3):
+            print(next(diffs), end='')
+        for diff in diffs:
+            print(diff)
+    except StopIteration:
+        # no diffs, so no big deal
+        pass
 
 
 def _print_diffs(jenkins_configs, generated_configs):

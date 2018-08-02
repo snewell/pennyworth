@@ -11,8 +11,7 @@ class ListJobsCommand(pennyworth.command.HostCommand):
     def process(self, parsed_args):
         #print("{}\n\n{}".format(host, parsed_args))
         host = self.make_host(parsed_args)
-        for name, job in sorted(host.list_jobs()):
-            del job
+        for name in sorted(i[0] for i in host.list_jobs()):
             print(name)
 
 

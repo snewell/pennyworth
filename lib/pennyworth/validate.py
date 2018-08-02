@@ -32,13 +32,10 @@ def _print_diff(name, jenkins_lines, generated_lines):
     diffs = difflib.unified_diff(jenkins_lines, generated_lines,
                                  "jenkins/{}".format(name),
                                  "generated/{}".format(name))
-    count = 0
+    for _ in range(3):
+        print(next(diffs), end='')
     for diff in diffs:
-        if count < 3:
-            print(diff, end='')
-            count += 1
-        else:
-            print(diff)
+        print(diff)
 
 
 def _print_diffs(jenkins_configs, generated_configs):

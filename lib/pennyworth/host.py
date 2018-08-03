@@ -39,6 +39,16 @@ class Host:
         """
         return self._host.get_jobs()
 
+    def change_job(self, name, xml):
+        job = self._host.get_job(name)
+        return job.update_config(xml)
+
+    def create_job(self, name, xml):
+        return self._host.create_job(name, xml)
+
+    def erase_job(self, name):
+        return self._host.delete_job(name)
+
 
 def make_host(host_config, folder=None):
     """

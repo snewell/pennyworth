@@ -75,6 +75,8 @@ def execute_command(command, args):
             # (e.g., head).  Might be a better way to handle this, but for now
             # silently swallowing the error isn't terrible.
             pass
+        else:
+            print("Error: {}".format(str(failure)), file=sys.stderr)
 
     except Exception as failure:
         print("Error: {}".format(str(failure)), file=sys.stderr)

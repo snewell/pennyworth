@@ -24,6 +24,7 @@ setup(
         'pennyworth.commands': [
             'build-jobs = pennyworth.build_jobs:_BUILD_JOBS_COMMAND',
             'list-jobs = pennyworth.list_jobs:_LIST_JOBS_COMMAND',
+            'sync = pennyworth.sync:_SYNC_COMMAND',
             'validate = pennyworth.validate:_VALIDATE_COMMAND'
         ],
     },

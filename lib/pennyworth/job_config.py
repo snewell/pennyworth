@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
+import os.path
 import re
 
 import pennyworth.config
+import pennyworth.job_template
 
 
 class ChunkCache:
@@ -19,6 +21,44 @@ class ChunkCache:
 _OPTION_PATTERN = re.compile(R"^sub\.")
 
 
+def _make_chunk_iterator(job_config):
+    class _ChunkIterator:
+        def __init__(self, chunks):
+            self._chunks = chunks
+            self._iter = iter(chunks)
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            return next(self._iter)
+
+    job_chunks = job_config.get('chunks')
+    return _ChunkIterator([chunk.strip() for chunk in job_chunks.split(',')])
+
+
+def _make_template_iterator(job_config):
+    class _TemplateIterator:
+        def __init__(self, template_config):
+            template_chunks = template_config.get_config().get('chunks')
+            chunks = [chunk.strip() for chunk in template_chunks.split(',')]
+            print("chunks = {}".format(chunks))
+            self._template_config = template_config
+            self._iter = iter(chunks)
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            chunk_name = next(self._iter)
+            return os.path.join(
+                self._template_config.get_template_folder(), chunk_name)
+
+    template_config = pennyworth.job_template.get_job_template(
+        job_config['template'])
+    return _TemplateIterator(template_config)
+
+
 class JobConfigs:
     def __init__(self, config):
         self._config = config
@@ -27,8 +67,10 @@ class JobConfigs:
         return self._config.sections()
 
     def get_job_chunks(self, job_name):
-        job_chunks = self._config[job_name].get('chunks')
-        return [chunk.strip() for chunk in job_chunks.split(',')]
+        if self._config.has_option(job_name, 'chunks'):
+            return _make_chunk_iterator(self._config[job_name])
+        elif self._config.has_option(job_name, 'template'):
+            return _make_template_iterator(self._config[job_name])
 
     def get_job_subs(self, job_name):
         subs = []

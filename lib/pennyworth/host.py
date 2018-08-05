@@ -8,8 +8,7 @@ import os
 import jenkinsapi.jenkins
 
 import pennyworth.config
-
-_DEFAULT_PATH = os.path.join(os.path.expanduser("~"), ".pennyworth.d")
+import pennyworth.paths
 
 
 def get_hosts():
@@ -20,8 +19,8 @@ def get_hosts():
 
     Returns a list of hosts defined in a hosts.conf file.
     """
-    return pennyworth.config.read_config(os.path.join(_DEFAULT_PATH,
-                                                      "hosts.conf"))
+    return pennyworth.config.read_config(
+        os.path.join(pennyworth.paths.get_config_root(), "hosts.conf"))
 
 
 class Host:

@@ -50,6 +50,8 @@ def _make_template_iterator(job_config):
 
         def __next__(self):
             chunk_name = next(self._iter)
+            if chunk_name in job_config:
+                return job_config[chunk_name]
             return os.path.join(
                 self._template_config.get_template_folder(), chunk_name)
 

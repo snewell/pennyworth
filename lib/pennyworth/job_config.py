@@ -42,7 +42,6 @@ def _make_template_iterator(job_config):
         def __init__(self, template_config):
             template_chunks = template_config.get_config().get('chunks')
             chunks = [chunk.strip() for chunk in template_chunks.split(',')]
-            print("chunks = {}".format(chunks))
             self._template_config = template_config
             self._iter = iter(chunks)
 

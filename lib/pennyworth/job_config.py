@@ -43,17 +43,32 @@ def _make_template_iterator(job_config):
             template_chunks = template_config.get_config().get('chunks')
             chunks = [chunk.strip() for chunk in template_chunks.split(',')]
             self._template_config = template_config
-            self._iter = iter(chunks)
+            self._template_iter = iter(chunks)
+            self._local_iter = None
 
         def __iter__(self):
             return self
 
+        def _next_chunk(self):
+            if self._local_iter:
+                try:
+                    return next(self._local_iter)
+                except StopIteration:
+                    self._local_iter = None
+            return None
+
         def __next__(self):
-            chunk_name = next(self._iter)
-            if chunk_name in job_config:
-                return job_config[chunk_name]
-            return os.path.join(
-                self._template_config.get_template_folder(), chunk_name)
+            next_value = self._next_chunk()
+            if not next_value:
+                chunk_name = next(self._template_iter)
+                if chunk_name in job_config:
+                    local_chunks = [
+                        chunk.strip() for chunk in job_config[chunk_name].split(',')]
+                    self._local_iter = iter(local_chunks)
+                    return self._next_chunk()
+                return os.path.join(
+                    self._template_config.get_template_folder(), chunk_name)
+            return next_value
 
     template_config = pennyworth.job_template.get_job_template(
         job_config['template'])

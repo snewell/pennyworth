@@ -37,6 +37,12 @@ class BuildJobsCommand(pennyworth.command.Command):
                           help="The jobs to generate")
 
     def process(self, parsed_args):
+        """
+        Process command-line arguments and execute the command.
+
+        Arguments
+        parsed_args - Parsed command-line arguments
+        """
         job_config = pennyworth.job_config.make_configs('jobs.conf')
         available_jobs = job_config.get_jobs()
         if 'jobs' in parsed_args:

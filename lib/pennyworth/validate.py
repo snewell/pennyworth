@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+"""Code to support the validate command."""
+
 import difflib
 
 import pennyworth.command
@@ -13,7 +15,7 @@ def _print_diff(name, jenkins_lines, generated_lines):
                                  "jenkins/{}".format(name),
                                  "generated/{}".format(name))
     for diff in diffs:
-        # The issue that control lines (file lines, line offsets) have a
+        # The issue is that control lines (file lines, line offsets) have a
         # trailing newline but the actual diff lines (both differences and
         # context lines) do not.  Since some of the diff tools I've trid get
         # unhappy when there are extra lines, this tries to make sure we don't
@@ -39,12 +41,22 @@ def _print_diffs(jenkins_configs, generated_configs):
 
 
 class ValidateCommand(pennyworth.command.HostCommand):
+    """
+    A command to validate jobs on a host match what pennyworth would generate.
+    """
+
     def __init__(self):
         super().__init__(prog="pennyworth validate",
                          description="Compare generated job configurations "
                                      "with what's actually in Jenkins")
 
     def process(self, parsed_args):
+        """
+        Process command-line arguments and execute the command.
+
+        Arguments
+        parsed_args - Parsed command-line arguments
+        """
         host = self.make_host(parsed_args)
         jenkins_configs = pennyworth.host.get_host_configs(host)
         generated_configs = pennyworth.job_config.generate_configs()

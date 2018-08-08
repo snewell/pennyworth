@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+"""Types and functions to support job configuration."""
+
 import os.path
 import re
 
@@ -8,13 +10,41 @@ import pennyworth.job_template
 
 
 class ChunkCache:
+    """
+    A class to cache configuration chunks.
+
+    Since pennyworth stitches together different files to form complete
+    configurations, it's likely that many jobs will share many of the same
+    chunks (e.g., the beginning and end of job configuration).  This class
+    keeps a cache of file contents to avoid opening and closing the same file
+    multiple times.
+    """
+
     def __init__(self):
         self._cache = {}
 
     def get(self, key, fallback=None):
+        """
+        Get file contents from the cache.
+
+        Arguments:
+        key - The filename to look up.
+        fallback - The return value if key isn't cached.
+
+        Return:
+        If key is cached, then the contents of its file.  If it's not in the
+        cache, then fallback.
+        """
         return self._cache.get(key, fallback)
 
     def set(self, key, value):
+        """
+        Set cache contents.
+
+        Arguments:
+        key - The filename being cached.
+        value - The conents of key.
+        """
         self._cache[key] = value
 
 
@@ -87,13 +117,22 @@ _BUILD_METHODS = {
 
 
 class JobConfigs:
+    """A class to work with job configuration"""
+
     def __init__(self, config):
         self._config = config
 
     def get_jobs(self):
+        """Retrieve a lsit of available jobs."""
         return self._config.sections()
 
     def get_job_chunks(self, job_name):
+        """
+        Retrive an iterator that provides the chunks making up a job.
+
+        Arguments:
+        job_name - The name of the job to generate.
+        """
         enabled_methods = []
         for option in self._config.options(job_name):
             if option in _BUILD_METHODS:
@@ -109,6 +148,16 @@ class JobConfigs:
                 job_name, enabled_methods))
 
     def get_job_subs(self, job_name):
+        """
+        Retrieve a list of string substitions for a job.
+
+        Arguments:
+        job_name - The job to generate substitions for.
+
+        Return:
+        A list of tuples, where the first element is a compiled-regular
+        expression and the second element is the value to substite.
+        """
         subs = []
         for option, value in self._config[job_name].items():
             match = _OPTION_PATTERN.match(option)
@@ -119,6 +168,15 @@ class JobConfigs:
 
 
 def make_configs(config_path):
+    """
+    Create a JobConfigs instance based on a configuration file.
+
+    Arguments:
+    config_path - Filesystem path to a job configuration file.
+
+    Returns:
+    A JobConfigs instance based on config_path.
+    """
     job_configs = pennyworth.config.read_config(config_path)
     return JobConfigs(job_configs)
 
@@ -142,11 +200,31 @@ def _sub_config(config, subs):
 
 
 def build_config(chunks, cache, subs):
+    """
+    Build a job configuration.
+
+    Arguments:
+    chunks - An iterator to configuration chunks.  This should probably be
+             something returned from JobConfigs.get_job_chunks.
+    cache - A ChunkCache object.
+    subs - Substitution patterns to use.  This should be something returned
+           from JobConfigs.get_job_subs.
+
+    Returns:
+    An XML string of the generated job.
+    """
     config = _build_config(chunks, cache)
     return _sub_config(config, subs)
 
 
 def generate_configs():
+    """
+    Create all configurations specified in a jobs.conf file.
+
+    Returns:
+    A dictionary of job configurations.  The keys will be job names, and the
+    values of each key will be XML configurations.
+    """
     job_config = make_configs('jobs.conf')
     available_jobs = job_config.get_jobs()
     chunk_cache = ChunkCache()

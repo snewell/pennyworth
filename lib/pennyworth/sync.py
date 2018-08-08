@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+"""Code to support the sync command."""
+
 import pennyworth.command
 import pennyworth.host
 import pennyworth.integrate
@@ -24,12 +26,20 @@ def _apply_jobs(host, jenkins_configs, generated_configs):
 
 
 class SyncCommand(pennyworth.command.HostCommand):
+    """A command to sync generated jobs with a Jenkins host."""
+
     def __init__(self):
         super().__init__(prog="pennyworth sync",
                          description="Sync generated configurations with "
                                      "Jenkins")
 
     def process(self, parsed_args):
+        """
+        Process command-line arguments and execute the command.
+
+        Arguments
+        parsed_args - Parsed command-line arguments
+        """
         host = self.make_host(parsed_args)
         jenkins_configs = pennyworth.host.get_host_configs(host)
         generated_configs = pennyworth.job_config.generate_configs()

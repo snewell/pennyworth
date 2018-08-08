@@ -40,13 +40,33 @@ class Host:
         return self._host.get_jobs()
 
     def change_job(self, name, xml):
+        """
+        Change a job's configuration on a host.
+
+        Arguments:
+        name - The name of the job.
+        xml - The xml configuration that should be applied.
+        """
         job = self._host.get_job(name)
         return job.update_config(xml)
 
     def create_job(self, name, xml):
+        """
+        Create a new job on the host.
+
+        Arguments:
+        name - The name of the new job.
+        xml - The configuration of the new job.
+        """
         return self._host.create_job(name, xml)
 
     def erase_job(self, name):
+        """
+        Remove a job from the host.
+
+        Arguments:
+        name - The name of the job to remove.
+        """
         return self._host.delete_job(name)
 
 
@@ -99,6 +119,16 @@ def make_host(host_config, folder=None):
 
 
 def get_host_configs(host):
+    """
+    Retrieve all jobs and their configurations from a host.
+
+    Arguments:
+    host - The Host to operate on.
+
+    Returns:
+    A dictionary of job configurations.  Each key will be a job name and the
+    value will be the job's configuration as an XML string.
+    """
     job_configs = {}
     for name, job in host.list_jobs():
         job_configs[name] = job.get_config()

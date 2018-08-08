@@ -81,8 +81,8 @@ def _make_template_iterator(job_config):
 
 
 _BUILD_METHODS = {
-    'chunks': lambda job_config: _make_chunk_iterator(job_config),
-    'template': lambda job_config: _make_template_iterator(job_config)
+    'chunks': _make_chunk_iterator,
+    'template': _make_template_iterator
 }
 
 

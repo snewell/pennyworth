@@ -80,6 +80,12 @@ def _make_template_iterator(job_config):
     return _TemplateIterator(template_config, job_config)
 
 
+_BUILD_METHODS = {
+    'chunks': lambda job_config: _make_chunk_iterator(job_config),
+    'template': lambda job_config: _make_template_iterator(job_config)
+}
+
+
 class JobConfigs:
     def __init__(self, config):
         self._config = config
@@ -88,10 +94,19 @@ class JobConfigs:
         return self._config.sections()
 
     def get_job_chunks(self, job_name):
-        if self._config.has_option(job_name, 'chunks'):
-            return _make_chunk_iterator(self._config[job_name])
-        elif self._config.has_option(job_name, 'template'):
-            return _make_template_iterator(self._config[job_name])
+        enabled_methods = []
+        for option in self._config.options(job_name):
+            if option in _BUILD_METHODS:
+                enabled_methods.append(option)
+
+        if len(enabled_methods) == 1:
+            return _BUILD_METHODS[enabled_methods[0]](self._config[job_name])
+        elif len(enabled_methods) == 0:
+            raise Exception(
+                "{} doesn't specify a build method".format(job_name))
+        raise Exception(
+            "{} specifies multiple build methods ({})".format(
+                job_name, enabled_methods))
 
     def get_job_subs(self, job_name):
         subs = []

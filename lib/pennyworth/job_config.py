@@ -37,42 +37,45 @@ def _make_chunk_iterator(job_config):
     return _ChunkIterator([chunk.strip() for chunk in job_chunks.split(',')])
 
 
+class _TemplateIterator:
+    def __init__(self, template_config, job_config):
+        template_chunks = template_config.get_config().get('chunks')
+        chunks = [chunk.strip() for chunk in template_chunks.split(',')]
+        self._job_config = job_config
+        self._template_config = template_config
+        self._template_iter = iter(chunks)
+        self._local_iter = None
+
+    def __iter__(self):
+        return self
+
+    def _next_chunk(self):
+        if self._local_iter:
+            try:
+                return next(self._local_iter)
+            except StopIteration:
+                self._local_iter = None
+        return None
+
+    def __next__(self):
+        next_value = self._next_chunk()
+        if not next_value:
+            chunk_name = next(self._template_iter)
+            if chunk_name in self._job_config:
+                local_chunks = [
+                    chunk.strip() for chunk in
+                    self._job_config[chunk_name].split(',')]
+                self._local_iter = iter(local_chunks)
+                return self._next_chunk()
+            return os.path.join(
+                self._template_config.get_template_folder(), chunk_name)
+        return next_value
+
+
 def _make_template_iterator(job_config):
-    class _TemplateIterator:
-        def __init__(self, template_config):
-            template_chunks = template_config.get_config().get('chunks')
-            chunks = [chunk.strip() for chunk in template_chunks.split(',')]
-            self._template_config = template_config
-            self._template_iter = iter(chunks)
-            self._local_iter = None
-
-        def __iter__(self):
-            return self
-
-        def _next_chunk(self):
-            if self._local_iter:
-                try:
-                    return next(self._local_iter)
-                except StopIteration:
-                    self._local_iter = None
-            return None
-
-        def __next__(self):
-            next_value = self._next_chunk()
-            if not next_value:
-                chunk_name = next(self._template_iter)
-                if chunk_name in job_config:
-                    local_chunks = [
-                        chunk.strip() for chunk in job_config[chunk_name].split(',')]
-                    self._local_iter = iter(local_chunks)
-                    return self._next_chunk()
-                return os.path.join(
-                    self._template_config.get_template_folder(), chunk_name)
-            return next_value
-
     template_config = pennyworth.job_template.get_job_template(
         job_config['template'])
-    return _TemplateIterator(template_config)
+    return _TemplateIterator(template_config, job_config)
 
 
 class JobConfigs:

@@ -4,6 +4,7 @@ import difflib
 
 import pennyworth.command
 import pennyworth.host
+import pennyworth.integrate
 import pennyworth.job_config
 
 
@@ -24,18 +25,17 @@ def _print_diff(name, jenkins_lines, generated_lines):
 
 
 def _print_diffs(jenkins_configs, generated_configs):
-    for name, config in jenkins_configs.items():
-        jenkins_lines = config.split('\n')
-        generated_lines = []
-        if name in generated_configs:
-            generated_lines = generated_configs[name].split('\n')
-            del generated_configs[name]
-        _print_diff(name, jenkins_lines, generated_lines)
+    def _handler(name, first, second):
+        first_lines = []
+        second_lines = []
+        if first:
+            first_lines = first.split('\n')
+        if second:
+            second_lines = second.split('\n')
 
-    jenkins_lines = []
-    for name, config in generated_configs.items():
-        generated_lines = config.split('\n')
-        _print_diff(name, jenkins_lines, generated_lines)
+        _print_diff(name, first_lines, second_lines)
+
+    pennyworth.integrate.compare(jenkins_configs, generated_configs, _handler)
 
 
 class ValidateCommand(pennyworth.command.HostCommand):

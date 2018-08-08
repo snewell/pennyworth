@@ -2,24 +2,25 @@
 
 import pennyworth.command
 import pennyworth.host
+import pennyworth.integrate
 import pennyworth.job_config
 
 
 def _apply_jobs(host, jenkins_configs, generated_configs):
-    for name, config in jenkins_configs.items():
-        if name in generated_configs:
-            generated_config = generated_configs[name]
-            del generated_configs[name]
-            if config != generated_config:
-                # update job
-                host.change_job(name, generated_config)
+    def _handler(name, first, second):
+        if first and second:
+            # both exist, so update jobs
+            host.change_job(name, second)
         else:
-            # job was removed
-            host.erase_job(name)
+            # only one exists
+            if first:
+                # job was removed
+                host.erase_job(name)
+            else:
+                # new job
+                host.create_job(name, second)
 
-    # everything left is a new job
-    for name, config in generated_configs.items():
-        host.create_job(name, config)
+    pennyworth.integrate.compare(jenkins_configs, generated_configs, _handler)
 
 
 class SyncCommand(pennyworth.command.HostCommand):

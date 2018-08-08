@@ -5,26 +5,6 @@ import pennyworth.host
 import pennyworth.job_config
 
 
-def _get_jenkins_configs(host):
-    job_configs = {}
-    for name, job in host.list_jobs():
-        job_configs[name] = job.get_config()
-    return job_configs
-
-
-def _get_generated_configs():
-    job_config = pennyworth.job_config.make_configs('jobs.conf')
-    available_jobs = job_config.get_jobs()
-    chunk_cache = pennyworth.job_config.ChunkCache()
-    jobs = {}
-    for job in available_jobs:
-        config = pennyworth.job_config.build_config(
-            job_config.get_job_chunks(job), chunk_cache,
-            job_config.get_job_subs(job))
-        jobs[job] = config
-    return jobs
-
-
 def _apply_jobs(host, jenkins_configs, generated_configs):
     for name, config in jenkins_configs.items():
         if name in generated_configs:
@@ -50,8 +30,8 @@ class SyncCommand(pennyworth.command.HostCommand):
 
     def process(self, parsed_args):
         host = self.make_host(parsed_args)
-        jenkins_configs = _get_jenkins_configs(host)
-        generated_configs = _get_generated_configs()
+        jenkins_configs = pennyworth.host.get_host_configs(host)
+        generated_configs = pennyworth.job_config.generate_configs()
         _apply_jobs(host, jenkins_configs, generated_configs)
 
 

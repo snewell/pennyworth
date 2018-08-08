@@ -23,6 +23,7 @@ _OPTION_PATTERN = re.compile(R"^sub\.")
 
 def _make_chunk_iterator(job_config):
     class _ChunkIterator:
+        # pylint: disable=too-few-public-methods
         def __init__(self, chunks):
             self._chunks = chunks
             self._iter = iter(chunks)
@@ -38,6 +39,7 @@ def _make_chunk_iterator(job_config):
 
 
 class _TemplateIterator:
+    # pylint: disable=too-few-public-methods
     def __init__(self, template_config, job_config):
         template_chunks = template_config.get_config().get('chunks')
         chunks = [chunk.strip() for chunk in template_chunks.split(',')]
@@ -127,3 +129,16 @@ def _sub_config(config, subs):
 def build_config(chunks, cache, subs):
     config = _build_config(chunks, cache)
     return _sub_config(config, subs)
+
+
+def generate_configs():
+    job_config = make_configs('jobs.conf')
+    available_jobs = job_config.get_jobs()
+    chunk_cache = ChunkCache()
+    jobs = {}
+    for job in available_jobs:
+        config = build_config(
+            job_config.get_job_chunks(job), chunk_cache,
+            job_config.get_job_subs(job))
+        jobs[job] = config
+    return jobs

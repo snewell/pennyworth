@@ -96,3 +96,10 @@ def make_host(host_config, folder=None):
         folders = _strip_bad_folder_slashes(folder).split('/')
         kwargs['baseurl'] += "/{}{}".format("job/", "/job/".join(folders))
     return Host(**kwargs)
+
+
+def get_host_configs(host):
+    job_configs = {}
+    for name, job in host.list_jobs():
+        job_configs[name] = job.get_config()
+    return job_configs

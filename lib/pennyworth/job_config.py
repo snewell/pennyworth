@@ -101,7 +101,7 @@ class JobConfigs:
 
         if len(enabled_methods) == 1:
             return _BUILD_METHODS[enabled_methods[0]](self._config[job_name])
-        elif len(enabled_methods) == 0:
+        elif not enabled_methods:
             raise Exception(
                 "{} doesn't specify a build method".format(job_name))
         raise Exception(
